@@ -73,12 +73,22 @@
     <Compile Include="Artist.cs" />
     <Compile Include="IdentityModels.cs" />
     <Compile Include="Library.cs" />
+    <Compile Include="Migrations\202202170131249_InitialMigration.cs" />
+    <Compile Include="Migrations\202202170131249_InitialMigration.designer.cs">
+      <DependentUpon>202202170131249_InitialMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Track.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202202170131249_InitialMigration.resx">
+      <DependentUpon>202202170131249_InitialMigration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
