@@ -23,17 +23,16 @@ namespace SpotifyTool.Service
         private static readonly ManualResetEvent mre = new ManualResetEvent(false);
         private static readonly Uri callbackUri = new Uri("http://localhost:5000/callback");
         private static SpotifyClient _client;
-        private static string tokenPath;
+        private static string spotifyClientId = "a0947f5c419d4f52b56dbce466137f20";
+        private static string challenge = "";
+        private static string verifier = "";
+        private static PKCETokenResponse tokenResp;
 
         public PrivateUser LoginSpotify()
         {
-            tokenPath = GetPath();
-
             GetAuth();
 
-            var token = ReadToken();
-
-            var config = SpotifyClientConfig.CreateDefault(token.AccessToken).WithHTTPLogger(new SimpleConsoleHTTPLogger());
+            var config = SpotifyClientConfig.CreateDefault(tokenResp.AccessToken).WithAuthenticator(new PKCEAuthenticator(spotifyClientId, tokenResp));
             _client = new SpotifyClient(config);
 
             return FetchUser();
@@ -42,12 +41,15 @@ namespace SpotifyTool.Service
         {
             _server = new EmbedIOAuthServer(callbackUri, 5000);
             _server.Start();
+            (verifier, challenge) = PKCEUtil.GenerateCodes();
 
             _server.AuthorizationCodeReceived += OnAuthorizationCodeReceived;
             _server.ErrorReceived += OnErrorReceived;
 
             var request = new LoginRequest(_server.BaseUri, Environment.GetEnvironmentVariable("SPOTIFY_CLIENT_ID", EnvironmentVariableTarget.Machine), LoginRequest.ResponseType.Code)
             {
+                CodeChallengeMethod = "S256",
+                CodeChallenge = challenge,
                 Scope = GetScopes()
             };
 
@@ -90,15 +92,15 @@ namespace SpotifyTool.Service
 
             var config = SpotifyClientConfig.CreateDefault();
             var tokenResponse = await new OAuthClient(config).RequestToken(
-              new AuthorizationCodeTokenRequest(
-                Environment.GetEnvironmentVariable("SPOTIFY_CLIENT_ID", EnvironmentVariableTarget.Machine),
-                Environment.GetEnvironmentVariable("SPOTIFY_CLIENT_SECRET", EnvironmentVariableTarget.Machine), 
-                response.Code,
-                callbackUri
+              new PKCETokenRequest(
+                spotifyClientId,
+                response.Code, 
+                callbackUri,
+                verifier
               )
             );
 
-            WriteToken(tokenResponse);
+            tokenResp = tokenResponse;
 
             mre.Set();
         }
@@ -110,43 +112,9 @@ namespace SpotifyTool.Service
             mre.Set();
         }
 
-        private static void WriteToken(AuthorizationCodeTokenResponse token)
-        {
-            using (StreamWriter file = File.CreateText(tokenPath))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, token);
-            }
-        }
-        private AuthorizationCodeTokenResponse ReadToken()
-        {
-            try
-            {
-                using (StreamReader streamReader = new StreamReader(tokenPath))
-                {
-                    string json = streamReader.ReadToEnd();
-                    return JsonConvert.DeserializeObject<AuthorizationCodeTokenResponse>(json);
-                }
-            }
-            catch
-            {
-                return null;
-            }
-        }
-        public void ClearToken()
-        {
-            if(File.Exists(tokenPath))
-                File.Delete(tokenPath);
-        }
         public string GetToken()
         {
-            var token = ReadToken();
-            return token.AccessToken;
-        }
-        private string GetPath()
-        {
-            var execPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return Path.Combine(execPath, @".\spotify_token.json");
+            return tokenResp.AccessToken;
         }
         public UserProfile GetUserProfile(string userId)
         {
@@ -174,15 +142,6 @@ namespace SpotifyTool.Service
                 Console.Read();
             }
             return null;
-        }
-        public bool CheckNeedToRefreshToken()
-        {
-            var tokenToRefresh = ReadToken();
-
-            if (tokenToRefresh == null)
-                return true;
-
-            return tokenToRefresh.ExpiresIn < 600;
         }
     }
 }
