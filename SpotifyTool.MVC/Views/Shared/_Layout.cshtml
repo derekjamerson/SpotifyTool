@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Spotify Tool</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            @if (Request.IsAuthenticated)
+            {
+                @Html.ActionLink(" Spotify Tool ", "Index", "Library", new { area = "" }, new { @class = "navbar-brand" })
+            }
+            else 
+            { 
+                @Html.ActionLink(" Spotify Tool ", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            }
+            @if (Request.IsAuthenticated)
+            {
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="#navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-auto">
+                        <li class="nav-item">
+                            @Html.ActionLink("Library", "ViewStats", "Library", null, new { @class = "nav-link" })
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                @User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li>@Html.ActionLink("View Profile", "ViewProfile", "Account", null, new { @class = "dropdown-item" })</li>
+                                <li><hr class="dropdown-divider"></li>
+                                @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <li>
+                                        <a style="text-decoration:none" href="javascript:document.getElementById('logoutForm').submit()">
+                                            <span class="dropdown-item">Logout</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+        </nav>
+
+
+
+
+
+
+
+
+            @*<nav class="navbar navbar-dark bg-dark navbar-expand-sm">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            @Html.ActionLink("Spotify Tool", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                        </div>
+                        @if (Request.IsAuthenticated)
+                         {
+                             <div class="navbar-collapse collapse">
+                                <ul class="nav navbar-nav">
+                                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                                    <li>@Html.ActionLink("Library Management", "About", "Home")</li>
+                                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                                </ul>
+                                @Html.Partial("_LoginPartial")
+                             </div>
+                         }
+                    </button>
+                </nav>*@
+            <div class="container body-content">
+                @RenderBody()
+                @*<hr />
+                    <footer>
+                        <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+                    </footer>*@
+            </div>
+
+            @Scripts.Render("~/bundles/jquery")
+            @Scripts.Render("~/bundles/bootstrap")
+            @RenderSection("scripts", required: false)
+</body>
+</html>

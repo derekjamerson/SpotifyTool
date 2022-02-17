@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="text-center jumbotron">
+    <br />
+    <h1>Fetch Library</h1>
+    <br />
+    <br />
+    <p class="lead">Last Fetch:  @ViewBag.LastFetch</p>
+    <br />
+    @using (Html.BeginForm("FetchLibrary", "Library"))
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class=" text-center btn btn-primary" id="Spotify" style="background-color:#1DB954" name="provider" value="Spotify" title="Fetch library from Spotify">Fetch Library</button>
+    }
+</div>

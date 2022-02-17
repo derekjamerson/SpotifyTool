@@ -1,0 +1,35 @@
+﻿@model Queue<SpotifyTool.Models.Track.TrackListItem>
+
+@{
+    ViewBag.Title = "TracksByArtist";
+}
+
+<h2>@ViewBag.Artist</h2>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Track</th>
+                <th scope="col">Album</th>
+            </tr>
+        </thead>
+        @foreach (var track in Model)
+        {
+            <tbody>
+                <tr>
+                    <td>@track.Title</td>
+                    <td>@track.Album</td>
+                </tr>
+            </tbody>
+        }
+
+    </table>
+</div>
+<div>
+    @using (Html.BeginForm("ViewStats", "Library"))
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn" title="Go Back">Go Back</button>
+    }
+</div>

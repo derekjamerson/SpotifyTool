@@ -1,0 +1,42 @@
+﻿@using Microsoft.AspNet.Identity
+@*@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+            </li>
+            <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+        </ul>
+    }
+}*@
+
+<div class="dropdown">
+    <ul class="nav navbar-nav navbar-right dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-expanded="false">
+        @User.Identity.GetUserName()
+    </ul>
+    <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+        <li>@Html.ActionLink("Refresh Library", "FetchLibrary", "Library", null, new { id = "dd-FetchLibrary", @class = "dropdown-item" })</li>
+        <li>@Html.ActionLink("View Profile", "ViewUserProfile", "Account", null, new { id = "dd-ViewUserProfile", @class = "dropdown-item" })</li>
+        <li>@Html.ActionLink("Logout", "LogOff", "Account", null, new { id = "dd-LogOff", @class = "dropdown-item" })</li>
+    </ul>
+</div>
+
+@*else
+{
+    <ul class="nav navbar-nav navbar-right">
+        @using (Html.BeginForm("SpotifyLogin", "Account"))
+         {
+            @Html.AntiForgeryToken()
+            <li>
+                <p>
+                    <button type="submit" class="btn btn-link" id="Spotify" name="provider" value="Spotify" title="Log in using your Spotify account">Log in</button>
+                </p>
+            </li>
+         }
+    </ul>
+
+}*@

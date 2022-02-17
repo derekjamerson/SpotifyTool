@@ -1,0 +1,54 @@
+﻿@model SpotifyTool.Models.User.UserProfile
+
+@{
+    ViewBag.Title = "ViewProfile";
+}
+<br />
+<hr />
+
+<h2 class="top-50">User Profile</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Username)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Username)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SpotifyId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SpotifyId)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    <button class="btn-primary" type="button" id="updateButton" onclick="window.location.href = '@Url.Action("UpdateProfile", "Account")';">
+        Update
+    </button>
+</p>
+
+

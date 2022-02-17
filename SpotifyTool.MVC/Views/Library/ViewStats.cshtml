@@ -1,0 +1,59 @@
+﻿@model SpotifyTool.Models.Library.LibraryStats
+
+@{
+    ViewBag.Title = "ViewStats";
+}
+<br />
+<hr />
+
+<h2 class="top-50">Your Library</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TrackCount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TrackCount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ArtistCount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ArtistCount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AveragePopularity)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AveragePopularity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ArtistsWithMostTracks)
+        </dt>
+
+        <dd>
+            @using (Html.BeginForm("TracksByArtist", "Library"))
+            {
+            <div class="list-group list-group-numbered">
+                @foreach (var item in Model.ArtistsWithMostTracks)
+                {
+                    @Html.HiddenFor(x => item.Key.Id)
+                    <button type="submit" class="list-group-item list-group-item-action" id="@item.Key.Name" value="@item.Key.Id" title="View all tracks by this Artist">
+                        @item.Key.Name
+                        <span class="badge bg-secondary">@item.Value</span>
+                    </button>
+                }
+            </div>
+            }
+        </dd>
+
+    </dl>
+</div>
