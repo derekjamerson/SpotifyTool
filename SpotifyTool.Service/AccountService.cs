@@ -46,7 +46,7 @@ namespace SpotifyTool.Service
             _server.AuthorizationCodeReceived += OnAuthorizationCodeReceived;
             _server.ErrorReceived += OnErrorReceived;
 
-            var request = new LoginRequest(_server.BaseUri, Environment.GetEnvironmentVariable("SPOTIFY_CLIENT_ID", EnvironmentVariableTarget.Machine), LoginRequest.ResponseType.Code)
+            var request = new LoginRequest(_server.BaseUri, spotifyClientId, LoginRequest.ResponseType.Code)
             {
                 CodeChallengeMethod = "S256",
                 CodeChallenge = challenge,
