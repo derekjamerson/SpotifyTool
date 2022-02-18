@@ -10,7 +10,7 @@
     <br />
     <p class="lead">This is a utility created to give users access to data not readily available through the Spotify application.</p>
     <br />
-    @using (Html.BeginForm("SpotifyLogin", "Account"))
+    @using (Html.BeginForm("SpotifyAuth", "Account"))
     {
         @Html.AntiForgeryToken()
         <button type="submit" class=" text-center btn btn-primary btn-lg" id="Spotify" style="background-color:#1DB954" name="provider" value="Spotify" title="Log in using Spotify account">Log in to Spotify</button>

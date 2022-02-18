@@ -19,37 +19,38 @@ namespace SpotifyTool.Service
 {
     public class AccountService
     {
-        private static EmbedIOAuthServer _server;
-        private static readonly ManualResetEvent mre = new ManualResetEvent(false);
-        private static readonly Uri callbackUri = new Uri("http://localhost:5000/callback");
         private static SpotifyClient _client;
-        private static string spotifyClientId = "a0947f5c419d4f52b56dbce466137f20";
-        private static string challenge = "";
-        private static string verifier = "";
-        private static PKCETokenResponse tokenResp;
+
+
+        #region LOCALCODE
+        // LOCALCODE
+        private static EmbedIOAuthServer _server;
+        private static readonly Uri callbackUri = new Uri("http://localhost:5000/callback");
+        private static ManualResetEvent mre;
+        private static readonly string filePath = @"C:\Users\Derek\source\repos\SpotifyTool/token.txt";
+
 
         public PrivateUser LoginSpotify()
         {
             GetAuth();
 
-            var config = SpotifyClientConfig.CreateDefault(tokenResp.AccessToken).WithAuthenticator(new PKCEAuthenticator(spotifyClientId, tokenResp));
+            var token = GetToken();
+            var config = SpotifyClientConfig.CreateDefault(token.AccessToken).WithAuthenticator(new AuthorizationCodeAuthenticator(GetClientId(), GetClientSecret(), token));
             _client = new SpotifyClient(config);
 
             return FetchUser();
         }
-        private static void GetAuth()
+        private void GetAuth()
         {
             _server = new EmbedIOAuthServer(callbackUri, 5000);
             _server.Start();
-            (verifier, challenge) = PKCEUtil.GenerateCodes();
+            mre = new ManualResetEvent(false);
 
             _server.AuthorizationCodeReceived += OnAuthorizationCodeReceived;
             _server.ErrorReceived += OnErrorReceived;
 
-            var request = new LoginRequest(_server.BaseUri, spotifyClientId, LoginRequest.ResponseType.Code)
+            var request = new LoginRequest(_server.BaseUri, GetClientId(), LoginRequest.ResponseType.Code)
             {
-                CodeChallengeMethod = "S256",
-                CodeChallenge = challenge,
                 Scope = GetScopes()
             };
 
@@ -58,6 +59,34 @@ namespace SpotifyTool.Service
             mre.WaitOne();
             mre.Reset();
         }
+
+        private async Task OnAuthorizationCodeReceived(object sender, AuthorizationCodeResponse response)
+        {
+            await _server.Stop();
+
+            var config = SpotifyClientConfig.CreateDefault();
+            var tokenResponse = await new OAuthClient(config).RequestToken(
+              new AuthorizationCodeTokenRequest(
+                GetClientId(),
+                GetClientSecret(),
+                response.Code,
+                callbackUri
+              )
+            );
+
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(tokenResponse));
+
+            mre.Set();
+        }
+
+        private static async Task OnErrorReceived(object sender, string error, string state)
+        {
+            await _server.Stop();
+
+            mre.Set();
+        }
+        #endregion
+
 
         private static List<string> GetScopes()
         {
@@ -86,35 +115,9 @@ namespace SpotifyTool.Service
                 };
         }
 
-        private static async Task OnAuthorizationCodeReceived(object sender, AuthorizationCodeResponse response)
+        public AuthorizationCodeTokenResponse GetToken()
         {
-            await _server.Stop();
-
-            var config = SpotifyClientConfig.CreateDefault();
-            var tokenResponse = await new OAuthClient(config).RequestToken(
-              new PKCETokenRequest(
-                spotifyClientId,
-                response.Code, 
-                callbackUri,
-                verifier
-              )
-            );
-
-            tokenResp = tokenResponse;
-
-            mre.Set();
-        }
-
-        private static async Task OnErrorReceived(object sender, string error, string state)
-        {
-            await _server.Stop();
-
-            mre.Set();
-        }
-
-        public string GetToken()
-        {
-            return tokenResp.AccessToken;
+            return JsonConvert.DeserializeObject<AuthorizationCodeTokenResponse>(File.ReadAllText(filePath));
         }
         public UserProfile GetUserProfile(string userId)
         {
@@ -130,18 +133,22 @@ namespace SpotifyTool.Service
         }
         public PrivateUser FetchUser()
         {
-            try
-            {
-                var user = _client.UserProfile.Current().Result;
+            var user = _client.UserProfile.Current().Result;
 
-                return user;
-            }
-            catch (Exception ex)
+            return user;
+        }
+        public string GetClientId()
+        {
+            using (var ctx = new ApplicationDbContext())
             {
-                Console.WriteLine(ex.Message);
-                Console.Read();
+                return ctx.Clients.FirstOrDefault().ClientId;
             }
-            return null;
+        }public string GetClientSecret()
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                return ctx.Clients.FirstOrDefault().ClientSecret;
+            }
         }
     }
 }

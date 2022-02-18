@@ -15,7 +15,7 @@ namespace SpotifyTool.Data
         public int CountArtists { get; set; }
         public int AveragePop { get; set; }
         public HashSet<string> DuplicateTrackIds { get; set; }
-        public Dictionary<string, int> TracksPerArtist { get; set; }
+        public List<string> TracksPerArtist { get; set; }
 
 
         public Library()

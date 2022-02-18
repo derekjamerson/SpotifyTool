@@ -16,13 +16,11 @@ namespace SpotifyTool.Service
     public class LibraryService
     {
         private static SpotifyClient _client;
-        private readonly string token;
 
         public LibraryService()
         {
             var _acctService = new AccountService();
-            token = _acctService.GetToken();
-            _client = new SpotifyClient(token);
+            _client = new SpotifyClient(_acctService.GetToken().AccessToken);
         }
 
         public async Task FetchLibrary(string userId)
@@ -213,9 +211,9 @@ namespace SpotifyTool.Service
                 return stats;
             }
         }
-        private Dictionary<string, int> GetTracksPerArtist(ICollection<Track> library, ICollection<Artist> _artists)
+        private List<string> GetTracksPerArtist(ICollection<Track> library, ICollection<Artist> _artists)
         {
-            var _output = new Dictionary<string, int>();
+            var _output = new List<string>();
 
             foreach(var artist in _artists)
             {
@@ -226,22 +224,22 @@ namespace SpotifyTool.Service
                         numSongs++;
                 }
 
-                _output.Add(artist.ArtistId, numSongs);
+                _output.Add(artist.ArtistId + "#" + numSongs);
             }
 
             return _output;
         }
-        private Queue<KeyValuePair<ArtistSimple, int>> GetArtistsWithMostTracks(Dictionary<string, int> model, int numRequested)
+        private Queue<KeyValuePair<ArtistSimple, int>> GetArtistsWithMostTracks(List<string> model, int numRequested)
         {
             using (var ctx = new ApplicationDbContext())
             {
                 var result = new Queue<KeyValuePair<ArtistSimple, int>>();
-                var selection = model.OrderByDescending(x => x.Value).Take(numRequested);
-                foreach(var entry in selection)
+                foreach(var entry in model)
                 {
-                    var artist = ctx.Artists.FirstOrDefault(x => x.ArtistId == entry.Key);
+                    var splitter = entry.Split('#');
+                    var artist = ctx.Artists.FirstOrDefault(x => x.ArtistId == splitter[0]);
                     var convA = new ArtistSimple { Id = artist.ArtistId, Name = artist.Name };
-                    result.Enqueue(new KeyValuePair<ArtistSimple, int>(convA, entry.Value));
+                    result.Enqueue(new KeyValuePair<ArtistSimple, int>(convA, Int32.Parse(splitter[1])));
                 }
                 return result;
             }

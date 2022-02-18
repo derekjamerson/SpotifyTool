@@ -38,6 +38,7 @@ namespace SpotifyTool.Data
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Album> Albums { get; set; }
         public DbSet<Library> Libraries { get; set; }
+        public DbSet<Client> Clients { get; set; }
 
 
         public static ApplicationDbContext Create()
