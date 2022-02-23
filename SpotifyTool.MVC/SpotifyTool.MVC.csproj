@@ -320,6 +320,7 @@
     <Content Include="Views\Library\ViewStats.cshtml" />
     <Content Include="Views\Library\Index.cshtml" />
     <Content Include="Views\Library\TracksByArtist.cshtml" />
+    <Content Include="Views\Library\PlaylistHome.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

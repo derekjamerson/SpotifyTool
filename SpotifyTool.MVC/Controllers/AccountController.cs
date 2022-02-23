@@ -123,6 +123,9 @@ namespace SpotifyTool.MVC.Controllers
             if (appUser == null)
             {
                 var user = new ApplicationUser { UserName = spotifyUser.DisplayName ?? spotifyUser.Id, Email = spotifyUser.Email, SpotifyId = spotifyUser.Id };
+                var image = spotifyUser.Images.FirstOrDefault();
+                if(image != null)
+                    user.ImageUrl = image.Url;
 
                 var result = await UserManager.CreateAsync(user);
 
@@ -160,7 +163,7 @@ namespace SpotifyTool.MVC.Controllers
 
         public ActionResult UpdateProfile()
         {
-            _accountService.FetchUser();
+            _accountService.UpdateUser();
 
             return RedirectToAction("ViewProfile");
         }

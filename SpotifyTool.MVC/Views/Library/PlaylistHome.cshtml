@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<hr />
+<h1 class="top-50 text-center">Playlist</h1>
+<hr />
+<br />
+
+<div class="row">
+    <div class="col-md-6 text-center">
+        <h2>Playlist By Artist</h2>
+        <p>
+            Create a playlist of songs from your library featuring chosen artists.
+        </p>
+        <p>
+            <button class="btn-primary" type="button" id="updateButton" onclick="window.location.href = '@Url.Action("BuildPlaylistByArtist", "Library")';">
+                Create
+            </button>
+        </p>
+    </div>
+    <div class="col-md-6 text-center">
+        <h2>True Random</h2>
+        <p>Create a playlist of randomly selected songs from your library.</p>
+        <p>
+            <button class="btn-primary" type="button" id="updateButton" onclick="window.location.href = '@Url.Action("BuildRandomPlaylist", "Library")';">
+                Go Random!
+            </button>
+        </p>
+    </div>
+</div>

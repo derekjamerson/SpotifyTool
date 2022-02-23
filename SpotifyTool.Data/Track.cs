@@ -14,6 +14,7 @@ namespace SpotifyTool.Data
         public string TrackId { get; set; }
         public string Title { get; set; }
         public int Popularity { get; set; } = 0;
+        public bool IsExplicit { get; set; }
 
         public Track()
         {

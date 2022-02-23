@@ -40,20 +40,41 @@
         </dt>
 
         <dd>
-            @using (Html.BeginForm("TracksByArtist", "Library"))
+            @{ int count = 0; }
+            @foreach (var item in Model.ArtistsWithMostTracks)
             {
-            <div class="list-group list-group-numbered">
-                @foreach (var item in Model.ArtistsWithMostTracks)
+                if (count % 5 == 0)
                 {
-                    @Html.HiddenFor(x => item.Key.Id)
-                    <button type="submit" class="list-group-item list-group-item-action" id="@item.Key.Name" value="@item.Key.Id" title="View all tracks by this Artist">
-                        @item.Key.Name
-                        <span class="badge bg-secondary">@item.Value</span>
-                    </button>
+                    @:<div class="list-group list-group-numbered list-group-horizontal-md">
+                        <button type="submit" class="list-group-item list-group-item-action position-relative" id="@item.Key.Name" title="View all tracks by this Artist" onclick="location.href='@Url.Action("TracksByArtist", "Library", new { @item.Key.Id})'">
+                            @item.Key.Name
+                            <span class="badge bg-secondary count">@item.Value</span>
+                        </button>
                 }
-            </div>
+                else
+                {
+                    <button type="submit" class="list-group-item list-group-item-action position-relative" id="@item.Key.Name" title="View all tracks by this Artist" onclick="location.href='@Url.Action("TracksByArtist", "Library", new { @item.Key.Id})'">
+                        @item.Key.Name
+                        <span class="badge bg-secondary count">@item.Value</span>
+                    </button>
+                    if (count % 5 == 4)
+                    {
+                       @:</div>
+                    }
+                }
+                count++;
             }
         </dd>
-
     </dl>
 </div>
+
+<style>
+    .count {
+        z-index: 1;
+        position: absolute;
+        top: 1px;
+        right: 25px;
+        margin-right: -25px;
+        background-color: #d9534f;
+    }
+</style>

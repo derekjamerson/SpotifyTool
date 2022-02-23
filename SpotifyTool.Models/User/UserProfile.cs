@@ -15,5 +15,6 @@ namespace SpotifyTool.Models.User
         public string Email { get; set; }
         [DisplayName("Spotify ID")]
         public string SpotifyId { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

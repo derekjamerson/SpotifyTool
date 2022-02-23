@@ -87,26 +87,21 @@ namespace SpotifyTool.Service
                                     if (inDb != null)
                                     {
                                         inDb.Name = artist.Name;
-                                        _artistsForTrack.Add(inDb);
                                         _artists.Add(inDb);
                                     }
                                     else
                                     {
                                         var newArtist = new Artist { ArtistId = artist.Id, Name = artist.Name };
-                                        _artistsForTrack.Add(newArtist);
                                         _artists.Add(newArtist);
                                     }
-                                }
-                                else
-                                {
-                                    _artistsForTrack.Add(inList);
                                 }
                             }
                         }
 
                         // ALBUM
                         Album albumForThisTrack = null;
-                        if (_albums.FirstOrDefault(x => x.AlbumId == track.Album.Id) == null)
+                        var albumInList = _albums.FirstOrDefault(x => x.AlbumId == track.Album.Id);
+                        if (albumInList == null)
                         {
                             var inDb = ctx.Albums.Include(x => x.Artists).FirstOrDefault(x => x.AlbumId == track.Album.Id);
 
@@ -131,6 +126,10 @@ namespace SpotifyTool.Service
                                 _albums.Add(albumForThisTrack);
                             }
                         }
+                        else
+                        {
+                            albumForThisTrack = albumInList;
+                        }
 
 
                         // TRACK
@@ -144,6 +143,7 @@ namespace SpotifyTool.Service
                                 inDb.Popularity = track.Popularity;
                                 inDb.Album = albumForThisTrack;
                                 inDb.Artists = _artistsForTrack;
+                                inDb.IsExplicit = track.Explicit;
                             }
                             else
                             {
@@ -155,6 +155,7 @@ namespace SpotifyTool.Service
                                         Popularity = track.Popularity,
                                         Album = albumForThisTrack,
                                         Artists = _artistsForTrack,
+                                        IsExplicit = track.Explicit,
                                     };
                                 ctx.Tracks.Add(inDb);
                             }
@@ -190,6 +191,7 @@ namespace SpotifyTool.Service
                 library.CountTracks = library.Tracks.Count;
                 library.TracksPerArtist = GetTracksPerArtist(library.Tracks, _artists);
                 library.AveragePop = CalcAvgPop(library.Tracks);
+                library.Artists = _artists;
 
                 var user = ctx.Users.FirstOrDefault(x => x.Id == userId);
                 user.Library = library;
@@ -207,13 +209,13 @@ namespace SpotifyTool.Service
                 stats.TrackCount = library.CountTracks;
                 stats.ArtistCount = library.CountArtists;
                 stats.AveragePopularity = library.AveragePop;
-                stats.ArtistsWithMostTracks = GetArtistsWithMostTracks(library.TracksPerArtist, 5);
+                stats.ArtistsWithMostTracks = GetArtistsWithMostTracks(library.TracksPerArtist, 10);
                 return stats;
             }
         }
-        private List<string> GetTracksPerArtist(ICollection<Track> library, ICollection<Artist> _artists)
+        private string GetTracksPerArtist(ICollection<Track> library, ICollection<Artist> _artists)
         {
-            var _output = new List<string>();
+            var _output = "";
 
             foreach(var artist in _artists)
             {
@@ -224,24 +226,36 @@ namespace SpotifyTool.Service
                         numSongs++;
                 }
 
-                _output.Add(artist.ArtistId + "#" + numSongs);
+                _output += (artist.ArtistId + "#" + numSongs + '#');
             }
 
             return _output;
         }
-        private Queue<KeyValuePair<ArtistSimple, int>> GetArtistsWithMostTracks(List<string> model, int numRequested)
+        private Queue<KeyValuePair<ArtistSimple, int>> GetArtistsWithMostTracks(string model, int numRequested)
         {
+
             using (var ctx = new ApplicationDbContext())
             {
-                var result = new Queue<KeyValuePair<ArtistSimple, int>>();
-                foreach(var entry in model)
+                var result = new List<KeyValuePair<ArtistSimple, int>>();
+                var forbidden = new List<string>() { "0LyfQWJT6nXafLPZqxe9Of" };
+                var splitter = model.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
+                for(int i = 0; i < splitter.Length; i++)
                 {
-                    var splitter = entry.Split('#');
-                    var artist = ctx.Artists.FirstOrDefault(x => x.ArtistId == splitter[0]);
-                    var convA = new ArtistSimple { Id = artist.ArtistId, Name = artist.Name };
-                    result.Enqueue(new KeyValuePair<ArtistSimple, int>(convA, Int32.Parse(splitter[1])));
+                    if(i % 2 == 0)
+                    {
+                        var aId = splitter[i];
+                        if (!forbidden.Contains(aId))
+                        {
+                            var artist = ctx.Artists.FirstOrDefault(x => x.ArtistId == aId);
+                            var convA = new ArtistSimple { Id = artist.ArtistId, Name = artist.Name };
+                            result.Add(new KeyValuePair<ArtistSimple, int>(convA, Int32.Parse(splitter[i + 1])));
+                        }
+                    }
                 }
-                return result;
+                if(numRequested > 0)
+                    return new Queue<KeyValuePair<ArtistSimple, int>>(result.OrderByDescending(x => x.Value).Take(numRequested));
+                else
+                    return new Queue<KeyValuePair<ArtistSimple, int>>(result.OrderByDescending(x => x.Value));
             }
         }
         public string GetLastFetch(string userId)
@@ -260,14 +274,12 @@ namespace SpotifyTool.Service
             using (var ctx = new ApplicationDbContext())
             {
                 var result = new List<TrackListItem>();
-                var _listOfTracks = ctx.Users.Include(x => x.Library.Tracks.Select(t => t.Album)).FirstOrDefault(x => x.Id == userId).Library.Tracks.ToList();
+                var user = ctx.Users.Include(x => x.Library.Tracks).FirstOrDefault(x => x.Id == userId);
+                var _listOfTracks = user.Library.Tracks.Where(x => x.Artists.FirstOrDefault(y => y.ArtistId == artistId) != null).ToList();
 
                 foreach(var track in _listOfTracks)
                 {
-                    if(track.Artists.FirstOrDefault(x => x.ArtistId == artistId) != null)
-                    {
-                        result.Add(new TrackListItem { Title = track.Title, Album = track.Album.Title});
-                    }
+                    result.Add(new TrackListItem { Title = track.Title, Album = track.Album.Title});
                 }
                 return new Queue<TrackListItem>(result.OrderBy(x => x.Title));
             }
@@ -283,5 +295,16 @@ namespace SpotifyTool.Service
         {
             return (int)Math.Round(library.Select(x => x.Popularity).Average(), MidpointRounding.AwayFromZero);
         }
+        //public List<ArtistSimple> GetArtists(string userId)
+        //{
+        //    using(var ctx = new ApplicationDbContext())
+        //    {
+        //        var user = ctx.Users.FirstOrDefault(x => x.Id==userId);
+        //        return
+        //            ctx
+        //                .Libraries
+        //                .FirstOrDefault(x => x. == userId)
+        //    }
+        //}
     }
 }

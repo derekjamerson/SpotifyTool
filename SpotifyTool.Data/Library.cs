@@ -15,13 +15,15 @@ namespace SpotifyTool.Data
         public int CountArtists { get; set; }
         public int AveragePop { get; set; }
         public HashSet<string> DuplicateTrackIds { get; set; }
-        public List<string> TracksPerArtist { get; set; }
+        public string TracksPerArtist { get; set; }
 
 
         public Library()
         {
             this.Tracks = new List<Track>();
+            this.Artists = new HashSet<Artist>();
         }
         public virtual ICollection<Track> Tracks { get; set; }
+        public virtual ICollection<Artist> Artists { get; set; }
     }
 }

@@ -46,5 +46,18 @@ namespace SpotifyTool.MVC.Controllers
             ViewBag.Artist = _service.GetArtistNameById(id);
             return View(model);
         }
+        public ActionResult PlaylistHome()
+        {
+            return View();
+        }
+        //public ActionResult BuildPlaylistByArtist()
+        //{
+        //    var model = _service.GetArtists();
+        //    return View(model);
+        //}
+        public ActionResult BuildRandomPlaylist()
+        {
+            return View();
+        }
     }
 }

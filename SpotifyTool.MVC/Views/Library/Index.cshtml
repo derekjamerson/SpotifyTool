@@ -5,7 +5,7 @@
 
 <div class="text-center jumbotron">
     <br />
-    <h1>Fetch Library</h1>
+    <h1>Welcome to my Spotify tool.</h1>
     <br />
     <br />
     <p class="lead">Last Fetch:  @ViewBag.LastFetch</p>
@@ -13,6 +13,18 @@
     @using (Html.BeginForm("FetchLibrary", "Library"))
     {
         @Html.AntiForgeryToken()
-        <button type="submit" class=" text-center btn btn-primary" id="Spotify" style="background-color:#1DB954" name="provider" value="Spotify" title="Fetch library from Spotify">Fetch Library</button>
+
+        <button type="submit" class=" text-center btn btn-primary" id="Spotify" style="background-color:#1DB954" onclick="updateButton()" name="provider" value="Spotify" title="Fetch library from Spotify">
+            <span id="Spinspin" class="spinner-border spinner-border-sm" style="display: none" role="status" aria-hidden="true"></span>
+            Fetch Library
+        </button>
     }
 </div>
+
+<script>
+    function updateButton() {
+        var button = document.getElementById("Spotify");
+        button.textContent = "Loading...";
+        button.classList.add("disabled");
+    }
+</script>

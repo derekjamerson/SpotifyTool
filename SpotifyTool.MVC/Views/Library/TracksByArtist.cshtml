@@ -3,9 +3,18 @@
 @{
     ViewBag.Title = "TracksByArtist";
 }
-
+<br />
+<hr />
 <h2>@ViewBag.Artist</h2>
+<hr />
 
+<div>
+    @using (Html.BeginForm("ViewStats", "Library"))
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-secondary" title="Go Back">Go Back</button>
+    }
+</div>
 <div class="table-responsive">
     <table class="table">
         <thead>
@@ -30,6 +39,6 @@
     @using (Html.BeginForm("ViewStats", "Library"))
     {
         @Html.AntiForgeryToken()
-        <button type="submit" class="btn" title="Go Back">Go Back</button>
+        <button type="submit" class="btn btn-secondary" title="Go Back">Go Back</button>
     }
 </div>

@@ -107,17 +107,9 @@
     <Compile Include="Client.cs" />
     <Compile Include="IdentityModels.cs" />
     <Compile Include="Library.cs" />
-    <Compile Include="Migrations\202202170131249_InitialMigration.cs" />
-    <Compile Include="Migrations\202202170131249_InitialMigration.designer.cs">
-      <DependentUpon>202202170131249_InitialMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202202180026362_AddedClientData.cs" />
-    <Compile Include="Migrations\202202180026362_AddedClientData.designer.cs">
-      <DependentUpon>202202180026362_AddedClientData.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202202180502569_AddedStatsToLibrary.cs" />
-    <Compile Include="Migrations\202202180502569_AddedStatsToLibrary.designer.cs">
-      <DependentUpon>202202180502569_AddedStatsToLibrary.cs</DependentUpon>
+    <Compile Include="Migrations\202202191637447_InitialMigration.cs" />
+    <Compile Include="Migrations\202202191637447_InitialMigration.designer.cs">
+      <DependentUpon>202202191637447_InitialMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -128,14 +120,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202202170131249_InitialMigration.resx">
-      <DependentUpon>202202170131249_InitialMigration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202202180026362_AddedClientData.resx">
-      <DependentUpon>202202180026362_AddedClientData.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202202180502569_AddedStatsToLibrary.resx">
-      <DependentUpon>202202180502569_AddedStatsToLibrary.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202202191637447_InitialMigration.resx">
+      <DependentUpon>202202191637447_InitialMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

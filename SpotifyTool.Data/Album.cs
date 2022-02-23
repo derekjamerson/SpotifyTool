@@ -14,7 +14,6 @@ namespace SpotifyTool.Data
         public string AlbumId { get; set; }
         public string Title { get; set; }
         public string ReleaseDate { get; set; }
-        //public List<Image> Images { get; set; }
 
         public Album()
         {

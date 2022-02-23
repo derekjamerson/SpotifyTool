@@ -17,8 +17,10 @@ namespace SpotifyTool.Data
         {
             this.Albums = new HashSet<Album>();
             this.Tracks = new List<Track>();
+            this.Libraries = new HashSet<Library>();
         }
         public virtual ICollection<Album> Albums { get; set; }
         public virtual ICollection<Track> Tracks { get; set; }
+        public virtual ICollection<Library> Libraries { get; set; }
     }
 }

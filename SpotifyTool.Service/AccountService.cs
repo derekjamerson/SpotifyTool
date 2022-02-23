@@ -128,14 +128,29 @@ namespace SpotifyTool.Service
                 if (user == null)
                     return null;
 
-                return new UserProfile() { Id = user.Id, Username = user.UserName, Email = user.Email, SpotifyId = user.SpotifyId };
+                return new UserProfile() { Id = user.Id, Username = user.UserName, Email = user.Email, SpotifyId = user.SpotifyId, ImageUrl = user.ImageUrl };
             }
         }
-        public PrivateUser FetchUser()
+        private PrivateUser FetchUser()
         {
-            var user = _client.UserProfile.Current().Result;
+            return _client.UserProfile.Current().Result;
+        }
+        public void UpdateUser()
+        {
+            using(var ctx = new ApplicationDbContext())
+            {
+                var user = FetchUser();
+                var inDb = ctx.Users.FirstOrDefault(x => x.SpotifyId == user.Id);
+                inDb.UserName = user.DisplayName ?? user.Id;
+                inDb.Email = user.Email;
+                inDb.SpotifyId = user.Id;
 
-            return user;
+                var image = user.Images.FirstOrDefault();
+                if (image != null)
+                    inDb.ImageUrl = image.Url;
+
+                ctx.SaveChanges();
+            }
         }
         public string GetClientId()
         {

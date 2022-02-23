@@ -6,10 +6,16 @@
 <br />
 <hr />
 
-<h2 class="top-50">User Profile</h2>
+<h2 class="top-50">
+      User Profile
+</h2>
 
 <div>
     <hr />
+    @if (@Model.ImageUrl != null)
+    {
+        <img src="@Model.ImageUrl" style="width: 60px; height: 60px; border-radius: 50%; border-style: none;" alt="Profile Image" />
+    }
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Id)

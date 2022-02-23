@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using SpotifyAPI.Web;
 
 namespace SpotifyTool.Data
 {
@@ -25,6 +26,7 @@ namespace SpotifyTool.Data
         public string SpotifyId { get; set; }
         public virtual Library Library { get; set; }
         public DateTime? LastFetch { get; set; }
+        public string ImageUrl { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
